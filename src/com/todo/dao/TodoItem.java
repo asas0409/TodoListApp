@@ -16,6 +16,12 @@ public class TodoItem {
         this.current_date= f.format(new Date());
     }
     
+    public TodoItem(String title, String desc, String current_date){
+        this.title=title;
+        this.desc=desc;
+        this.current_date= current_date;
+    }
+    
     public String getTitle() {
         return title;
     }

@@ -1,5 +1,10 @@
 package com.todo.service;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 import com.todo.dao.TodoItem;
@@ -20,12 +25,13 @@ public class TodoUtil {
 			System.out.printf("중복된 제목은 사용할 수 없습니다.");
 			return;
 		}
-		
+		sc.nextLine();
 		System.out.print("내용 >> ");
-		desc = sc.next();
+		desc = sc.nextLine().trim();
 		
 		TodoItem t = new TodoItem(title, desc);
 		list.addItem(t);
+		System.out.println("추가되었습니다.");
 	}
 
 	public static void deleteItem(TodoList l) {
@@ -59,15 +65,15 @@ public class TodoUtil {
 			return;
 		}
 
-		System.out.print("새제목 >> ");
+		System.out.print("새 제목 >> ");
 		String new_title = sc.next().trim();
 		if (l.isDuplicate(new_title)) {
 			System.out.println("제목은 중복될 수 없습니다.");
 			return;
 		}
-		
+		sc.nextLine();
 		System.out.print("새 내용 >> ");
-		String new_description = sc.next().trim();
+		String new_description = sc.nextLine().trim();
 		for (TodoItem item : l.getList()) {
 			if (item.getTitle().equals(title)) {
 				l.deleteItem(item);
@@ -84,5 +90,51 @@ public class TodoUtil {
 		for (TodoItem item : l.getList()) {
 			System.out.println(item.toString());
 		}
+	}
+	
+	public static void saveList(TodoList l, String filename) {
+		FileWriter w = null;
+		try {
+			w = new FileWriter(filename);
+			for(TodoItem itemToWrite : l.getList()) {
+				w.write(itemToWrite.toSaveString());
+			}
+			System.out.println("데이터가 저장되었습니다.");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			try {
+				w.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public static void loadList(TodoList l, String filename) {
+		BufferedReader r;
+		int count = 0;
+		try {
+			r = new BufferedReader(new FileReader(filename));
+			String data = null;
+			try {
+				while((data = r.readLine())!=null) {
+					StringTokenizer stk = new StringTokenizer(data, "##");
+					l.addItem(new TodoItem(stk.nextToken(),stk.nextToken(),stk.nextToken()));
+					count++;
+				}
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			System.out.println(count + "개의 항목을 읽었습니다.");
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println(filename + " 파일이 없습니다.");
+		}
+	
 	}
 }
